@@ -36,7 +36,7 @@ const program = new Command();
 program
   .name('roast-my-react')
   .description('Brutally funny AI roasts of your React/Next.js app — with real fixes underneath.')
-  .version('0.9.0')
+  .version('0.9.1')
   .option('--url <url>', 'target a running app (auto-detected if omitted)')
   .option('--report', 'generate ./roast-report.html', false)
   .option('--severity <n>', '1=gentle, 2=normal, 3=savage', '2')

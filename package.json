@@ -1,6 +1,6 @@
 {
   "name": "roast-my-react",
-  "version": "0.9.0",
+  "version": "0.9.1",
   "description": "Brutally funny AI roasts of your React/Next.js app's real performance, accessibility & bundle problems — with actual fixes underneath.",
   "type": "module",
   "bin": {
@@ -17,9 +17,7 @@
     "build": "tsc -p tsconfig.json",
     "dev": "tsc -p tsconfig.json --watch",
     "start": "node dist/cli.js",
-    "prepublishOnly": "npm run build",
-    "demo:app": "cd examples/slow-roast-app && npm run dev -- --port 5173",
-    "demo:record": "scripts/record-demo.sh"
+    "prepublishOnly": "npm run build"
   },
   "keywords": [
     "react",

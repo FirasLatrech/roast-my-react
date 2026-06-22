@@ -5,18 +5,12 @@
 ### Your React app has problems. This CLI finds them, then makes fun of you for it.
 
 `roast-my-react` runs a real Lighthouse + axe-core + bundle + re-render audit against your running
-app, then hands the cold hard numbers to Claude and asks it to roast you — with an actual fix under
+app, then turns the cold hard numbers into a brutally funny roast — with an actual fix under
 every burn.
 
 ```bash
 npx roast-my-react
 ```
-
-![roast-my-react demo](./assets/demo.gif)
-
-> The GIF is recorded automatically with [VHS](https://github.com/charmbracelet/vhs) against the
-> [`examples/slow-roast-app`](./examples/slow-roast-app) fixture. Re-record it anytime with
-> `npm run demo:record` (requires a free Groq key for the roasts).
 
 [![npm](https://img.shields.io/npm/v/roast-my-react.svg)](https://www.npmjs.com/package/roast-my-react)
 [![node](https://img.shields.io/node/v/roast-my-react.svg)](https://nodejs.org)
@@ -52,32 +46,8 @@ npx roast-my-react --report
 > the first running app it finds. If several are up (hello, monorepos), it lists them so you can
 > target a specific one with `--url`.
 
-To unlock the roasts, set a **free** [Groq API key](https://console.groq.com/keys) (no credit card,
-runs Llama 3.3 70B):
-
-```bash
-export GROQ_API_KEY=gsk_...
-```
-
-Prefer something else? Any OpenAI-compatible API works — point it anywhere:
-
-```bash
-# OpenRouter free models
-export ROAST_BASE_URL=https://openrouter.ai/api/v1
-export ROAST_API_KEY=sk-or-...
-export ROAST_MODEL=meta-llama/llama-3.3-70b-instruct:free
-
-# Fully local with Ollama — no key at all
-export ROAST_BASE_URL=http://localhost:11434/v1
-export ROAST_MODEL=llama3.1
-
-# OpenAI
-export ROAST_BASE_URL=https://api.openai.com/v1
-export ROAST_API_KEY=sk-...
-export ROAST_MODEL=gpt-4o-mini
-```
-
-Without any key it still runs every audit and prints the raw findings — you just don't get the comedy.
+The jokes are powered by a free AI model. Set a key once and you're done — without one you still get
+the full audit, just no comedy. See [AI provider](#ai-provider) for the one-line setup.
 
 > Zero setup: the first run automatically downloads a headless Chromium (~120 MB, one-time). No
 > global installs, no config files.
@@ -179,14 +149,17 @@ always override it; it overrides the built-in defaults.
 
 Commands: `roast-my-react [options]` (audit) · `roast-my-react login [--url]` (save a session).
 
-Environment:
+## AI provider
 
-| Variable          | Description                                                                    |
-| ----------------- | ------------------------------------------------------------------------------ |
-| `GROQ_API_KEY`    | Free key for the default provider. Without any key, raw findings are shown.    |
-| `ROAST_API_KEY`   | Generic key (also reads `OPENROUTER_API_KEY` / `OPENAI_API_KEY`).              |
-| `ROAST_BASE_URL`  | Any OpenAI-compatible base URL (default Groq: `https://api.groq.com/openai/v1`). |
-| `ROAST_MODEL`     | Model id (default `llama-3.3-70b-versatile`; set a smaller one like `llama-3.1-8b-instant` for speed). |
+The roasts need a (free) AI key — without one you still get the full audit, just no jokes.
+
+```bash
+export GROQ_API_KEY=gsk_...   # free, no credit card → https://console.groq.com/keys
+```
+
+Want a different model or provider? Any OpenAI-compatible endpoint works via
+`ROAST_BASE_URL` + `ROAST_API_KEY` + `ROAST_MODEL` (defaults to a fast, free model). That's the whole
+story — no lock-in, nothing else to configure.
 
 ## How it works
 
@@ -200,11 +173,10 @@ Environment:
      (the same trick React DevTools and [bippy](https://github.com/aidenybai/bippy) use) and counts
      how many times each component re-renders during a short interaction pass.
    - **axe-core** for WCAG accessibility violations.
-3. **Roast** — the structured findings go to a free LLM (Groq by default, or any OpenAI-compatible
-   endpoint) with a strict JSON contract: one punchy roast + one correct fix per issue, matched to
-   your chosen severity. Responses are parsed defensively.
-4. **Report** — beautiful terminal output, plus an optional self-contained HTML report with the
-   screenshot, scores, and every roast/fix.
+3. **Roast** — the structured findings go to a free AI model with a strict JSON contract: one punchy
+   roast + one correct fix per issue, matched to your chosen severity. Responses are parsed defensively.
+4. **Report** — a clean "diagnosis" in the terminal, plus an optional self-contained HTML report and
+   a shareable PNG card with the grade, scores, Core Web Vitals, and every roast/fix.
 
 Everything fails soft: a broken individual audit becomes a warning, not a crashed run. No telemetry,
 no signup, zero config.
@@ -212,7 +184,7 @@ no signup, zero config.
 ## Development
 
 ```bash
-git clone https://github.com/your-org/roast-my-react
+git clone https://github.com/FirasLatrech/roast-my-react
 cd roast-my-react
 npm install
 npm run build
