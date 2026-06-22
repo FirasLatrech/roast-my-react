@@ -12,6 +12,8 @@ every burn.
 npx roast-my-react
 ```
 
+![roast-my-react demo](./assets/demo.gif)
+
 [![npm](https://img.shields.io/npm/v/roast-my-react.svg)](https://www.npmjs.com/package/roast-my-react)
 [![node](https://img.shields.io/node/v/roast-my-react.svg)](https://nodejs.org)
 [![license](https://img.shields.io/npm/l/roast-my-react.svg)](./LICENSE)
