@@ -1,0 +1,96 @@
+# roast-my-react — comment a performance/a11y roast on every PR.
+#
+# Setup:
+#   1. Copy this file into your own repo at .github/workflows/roast.yml
+#   2. Add a repo secret GROQ_API_KEY (free key: https://console.groq.com/keys)
+#   3. Adjust the "Start the app" step to match how your app runs.
+name: roast-my-react
+
+on:
+  pull_request:
+
+permissions:
+  contents: read
+  pull-requests: write # needed to post the comment
+
+jobs:
+  roast:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      # --- Customize this for your project --------------------------------
+      # Build and start your app, then wait until it answers. Examples:
+      #   Next.js:  npm run build && npm run start &   (port 3000)
+      #   Vite:     npm run build && npm run preview &  (port 4173)
+      #   Nx:       npx nx serve my-app &               (port 4300)
+      - name: Start the app
+        run: |
+          npm run build
+          npm run start &
+          npx wait-on http://localhost:3000 --timeout 60000
+      # --------------------------------------------------------------------
+
+      - name: Run roast-my-react
+        id: roast
+        env:
+          GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+        run: |
+          npx roast-my-react@latest --url http://localhost:3000 --json > roast.json || true
+
+      - name: Build PR comment
+        id: comment
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            let data;
+            try { data = JSON.parse(fs.readFileSync('roast.json', 'utf8')); }
+            catch { core.setOutput('body', '🔥 roast-my-react could not produce a report.'); return; }
+            const f = data.findings || {};
+            const scores = (f.lighthouse?.scores || [])
+              .map(s => `**${s.title}** ${s.score ?? 'n/a'}/100`).join(' · ');
+            const issues = (data.issues || []).slice(0, 8)
+              .map((i, n) => `${n + 1}. \`${i.category}\` ${i.title}`).join('\n');
+            const body = [
+              `## 🔥 roast-my-react`,
+              ``,
+              scores || '_No Lighthouse scores_',
+              ``,
+              `<details><summary>${(data.issues || []).length} issues found</summary>`,
+              ``,
+              issues || '_Nothing to roast._',
+              ``,
+              `</details>`,
+              ``,
+              `_Run \`npx roast-my-react\` locally for the full roast + fixes._`,
+            ].join('\n');
+            core.setOutput('body', body);
+
+      - name: Post / update comment
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const body = ${{ toJSON(steps.comment.outputs.body) }};
+            const { data: comments } = await github.rest.issues.listComments({
+              owner: context.repo.owner, repo: context.repo.repo, issue_number: context.issue.number,
+            });
+            const marker = '## 🔥 roast-my-react';
+            const existing = comments.find(c => c.body && c.body.startsWith(marker));
+            if (existing) {
+              await github.rest.issues.updateComment({
+                owner: context.repo.owner, repo: context.repo.repo, comment_id: existing.id, body,
+              });
+            } else {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner, repo: context.repo.repo, issue_number: context.issue.number, body,
+              });
+            }

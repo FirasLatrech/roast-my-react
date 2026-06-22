@@ -1,0 +1,58 @@
+{
+  "name": "roast-my-react",
+  "version": "0.9.0",
+  "description": "Brutally funny AI roasts of your React/Next.js app's real performance, accessibility & bundle problems — with actual fixes underneath.",
+  "type": "module",
+  "bin": {
+    "roast-my-react": "dist/cli.js"
+  },
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "dev": "tsc -p tsconfig.json --watch",
+    "start": "node dist/cli.js",
+    "prepublishOnly": "npm run build",
+    "demo:app": "cd examples/slow-roast-app && npm run dev -- --port 5173",
+    "demo:record": "scripts/record-demo.sh"
+  },
+  "keywords": [
+    "react",
+    "nextjs",
+    "performance",
+    "accessibility",
+    "lighthouse",
+    "bundle-size",
+    "cli",
+    "roast",
+    "ai",
+    "developer-tools"
+  ],
+  "author": "Firas Latrach",
+  "license": "MIT",
+  "homepage": "https://github.com/FirasLatrech/roast-my-react#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/FirasLatrech/roast-my-react.git"
+  },
+  "bugs": {
+    "url": "https://github.com/FirasLatrech/roast-my-react/issues"
+  },
+  "dependencies": {
+    "@axe-core/playwright": "^4.10.1",
+    "chalk": "^5.3.0",
+    "commander": "^12.1.0",
+    "lighthouse": "^12.2.1",
+    "ora": "^8.1.1",
+    "playwright": "^1.49.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.0",
+    "typescript": "^5.7.2"
+  }
+}
